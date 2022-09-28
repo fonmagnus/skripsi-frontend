@@ -116,6 +116,7 @@
           :problemset="problemset"
         />
       </div>
+      <div class="admin__empty flex flex-column"></div>
     </div>
     <ContestControl
       @nextProblem="nextProblem"
@@ -154,7 +155,7 @@ export default {
       selectedIdx: 0,
       displayInstruction: true,
       timer: 0,
-      adsenseClientId: "",
+      emptyenseClientId: "",
       problemset: {},
       activeVirtualContest: {},
       disableSubmission: false,
@@ -350,7 +351,7 @@ export default {
       width: 60%;
     }
   }
-  &__ads {
+  &__empty {
     overflow-y: scroll;
     width: 20%;
     @media #{map-get($display-breakpoints, 'sm-and-down')} {
