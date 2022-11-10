@@ -374,4 +374,11 @@ export default {
       config
     )
   },
+  
+  getOjProblems(config = null) {
+    return $axios.get(
+      `${resource}/get-oj-problems`,
+      config
+    )
+  },
 };

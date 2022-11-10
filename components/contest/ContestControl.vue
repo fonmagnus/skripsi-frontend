@@ -1,5 +1,5 @@
 <template>
-  <div class="flex centered-items end-content pb-1 pr-3 layout-container">
+  <div class="flex items-center justify-end pb-1 pr-3 layout-container">
     <vs-button
       class="button mt-2"
       transparent
@@ -64,8 +64,8 @@
           Silakan copy-paste source code (C++) milikmu di bawah ini 👇
         </h4>
       </template>
-      <div class="flex flex-column">
-        <div class="flex end-content">
+      <div class="flex flex-col">
+        <div class="flex justify-end">
           <vs-checkbox
             label-before
             v-model="enableCodeEditor"
@@ -76,7 +76,7 @@
             </span>
           </vs-checkbox>
         </div>
-        <div class="flex centered">
+        <div class="flex items-center justify-center">
           <editor
             v-if="enableCodeEditor"
             class="code-editor"
@@ -100,7 +100,7 @@
         </div>
       </div>
       <template #footer>
-        <div class="flex end-content centered-items">
+        <div class="flex justify-end items-center">
           <span v-if="hasSubmittedAnswer">
             <span :style="formatClass(status)" class="verdict">{{
               verdict
@@ -151,7 +151,7 @@
         <h4 class="mt-3" style="text-align: center">Submissions</h4>
       </template>
 
-      <div class="flex centered mb-3">
+      <div class="flex items-center justify-center mb-3">
         <vs-button
           transparent
           :active="!isShowingAllSubmissions"
@@ -169,7 +169,7 @@
         </vs-button>
       </div>
 
-      <!-- <div class="flex end-content">
+      <!-- <div class="flex justify-end">
         <vs-button v-if="$auth.user.role === 'Admin'" @click="rejudgeAll" transparent>Rejudge All &nbsp;
           <i class="bx bx-sync"></i>
         </vs-button>
@@ -220,7 +220,7 @@
               </span>
             </vs-td>
             <vs-td style="width: 25%">
-              <div class="flex start-content">
+              <div class="flex justify-start">
                 <vs-button transparent @click="viewSubmissionDetail(tr.id)">
                   <i class="bx bx-search"></i>
                   View
@@ -281,7 +281,7 @@
           (problemset.type === 'FULL_CODING' &&
             problemset.enable_partial_scoring)
         "
-        class="flex centered mt-3"
+        class="flex items-center justify-center mt-3"
       >
         <vs-table striped>
           <template #thead>
@@ -320,7 +320,10 @@
           <template #notFound> (Belum ada submission) </template>
         </vs-table>
       </div>
-      <div class="flex centered mt-3" ref="theSubmissionDetail">
+      <div
+        class="flex items-center justify-center mt-3"
+        ref="theSubmissionDetail"
+      >
         <editor
           class="code-editor"
           v-model="submission.source_code"
@@ -340,11 +343,11 @@
       prevent-close
       not-close
     >
-      <div class="flex flex-column start-items centered-content mt-3">
+      <div class="flex flex-col items-start justify-center mt-3">
         <h3 class="mx-3">Edit Problemset</h3>
-        <div class="flex flex-column start-content start-items mt-3 mb-1">
+        <div class="flex flex-col justify-start items-start mt-3 mb-1">
           <span class="mx-3">Problems : </span>
-          <div class="flex start-content start-items">
+          <div class="flex justify-start items-start">
             <vs-button class="button mx-3" flat @click="appendProblem"
               >Add &nbsp;<i class="bx bx-plus"></i
             ></vs-button>
@@ -353,12 +356,12 @@
 
         <div
           v-if="problemset.type === 'FULL_CODING'"
-          class="flex flex-column start-items"
+          class="flex flex-col items-start"
         >
           <div
             v-for="(problem, i) in currentProblems"
             :key="i"
-            class="flex start-content centered-items mt-2"
+            class="flex justify-start items-center mt-2"
           >
             <vs-select
               border
@@ -410,12 +413,12 @@
 
         <div
           v-else-if="problemset.type === 'INTERNAL_CODING'"
-          class="flex flex-column start-items"
+          class="flex flex-col items-start"
         >
           <div
             v-for="(problem, i) in currentProblems"
             :key="i"
-            class="flex start-content centered-items mt-2"
+            class="flex justify-start items-center mt-2"
           >
             <vs-input
               @change="fetchCodingProblem(problem)"
@@ -448,7 +451,7 @@
           </div>
         </div>
 
-        <div class="flex end-content mt-5">
+        <div class="flex justify-end mt-5">
           <vs-button flat active class="button" @click="updateProblems"
             >Update</vs-button
           >
@@ -457,13 +460,13 @@
     </vs-dialog>
 
     <vs-dialog v-model="displayRemoveProblemDialog">
-      <div class="flex flex-column centered pt-3">
+      <div class="flex flex-col items-center justify-center pt-3">
         <h3>Are you sure?</h3>
         <span style="text-align: center"
           >Apakah kamu yakin mau menghapus problem ini dari contest?
           <br />(operasi ini tidak dapat di-undo)</span
         >
-        <div class="flex centered mt-3">
+        <div class="flex items-center justify-center mt-3">
           <vs-button
             class="button"
             color="danger"

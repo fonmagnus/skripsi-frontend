@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex-column centered-items flex pt-4 pb-3 mb-5 px-3"
+    class="flex-col items-center flex pt-4 pb-3 mb-5 px-3"
     :style="displayed ? '' : 'display: none;'"
     :class="[
       $vuetify.breakpoint.smAndDown ? 'shadow' : '',
@@ -60,7 +60,7 @@
     </span> -->
     <br />
 
-    <div v-if="problem.oj_problem" class="mx-3 flex flex-column">
+    <div v-if="problem.oj_problem" class="mx-3 flex flex-col">
       <!-- <span v-html="readMD(problem.oj_problem.body)" class="html-container"></span> -->
       <latex
         v-if="renderable"
@@ -75,7 +75,7 @@
       ></div>
       <!-- <span v-else>Not renderable</span> -->
     </div>
-    <div v-else-if="problem.coding_problem" class="mx-3 flex flex-column">
+    <div v-else-if="problem.coding_problem" class="mx-3 flex flex-col">
       <!-- <span v-html="readMD(problem.coding_problem.body)" class="html-container"></span> -->
       <latex
         :key="latex"

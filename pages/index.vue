@@ -1,7 +1,7 @@
 
 <template>
   <div
-    class="flex flex-column fullscreen centered-items start-content mt-3"
+    class="flex flex-col fullscreen items-center justify-start mt-3"
     :style="theme === 'dark' ? 'background-color:black; color:white' : ''"
     style="height: 100%; min-height: 100vh"
   >
@@ -54,7 +54,7 @@ export default {
   },
   mounted() {
     if (this.$auth?.getToken("local")) {
-      // this.$router.push('/problems');
+      this.$router.push("/home");
     }
   },
   computed: {

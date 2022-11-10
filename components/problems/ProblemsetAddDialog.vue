@@ -1,15 +1,10 @@
 <template>
-  <div class="flex end-content" style="max-height: 6%">
+  <div class="flex justify-end" style="max-height: 6%">
     <vs-button class="button" transparent @click="showAddProblemsetDialog">
       <i class="bx bx-plus"></i>
       Create New Problemset
     </vs-button>
-    <vs-dialog
-      v-model="isShowingAddProblemsetDialog"
-      blur
-      auto-width
-      prevent-close
-    >
+    <vs-dialog v-model="isShowingAddProblemsetDialog" auto-width prevent-close>
       <ProblemsetForm @closeDialog="closeAddProblemsetDialog" />
     </vs-dialog>
   </div>

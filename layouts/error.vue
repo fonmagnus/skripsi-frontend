@@ -1,5 +1,5 @@
 <template>
-  <div class="flex centered flex-column fullscreen pa-3">
+  <div class="flex items-center justify-center flex-col fullscreen pa-3">
     <h1 class="ma-3">{{ getErrorTitle() }}</h1>
     <h2 style="text-align: center">{{ getErrorMessage() }}</h2>
     <lottie

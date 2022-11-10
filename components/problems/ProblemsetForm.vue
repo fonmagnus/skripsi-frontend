@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-column start-items pt-4 px-3 form-container">
+  <div class="flex flex-col items-start pt-4 px-3 form-container">
     <h3 class="text-center mb-5">Add New Problemset</h3>
-    <div class="flex start-content start-items mt-5">
+    <div class="flex justify-start items-start mt-5">
       <vs-input
         border
         label-placeholder="Title"
@@ -19,13 +19,13 @@
         type="number"
         v-model="problemset.duration"
       >
-        <template v-if="problemset.duration === 0" #message-success>
+        <template v-if="problemset.duration === 0" #message-primary>
           Set it to 0 for never-ends
         </template>
       </vs-input>
     </div>
 
-    <div class="flex start-content start-items mt-5">
+    <div class="flex justify-start items-start mt-5">
       <vs-input
         border
         label="Start Date"
@@ -50,80 +50,92 @@
       </vs-input>
     </div>
 
-    <div class="flex start-content start-items mt-2">
+    <div class="flex justify-start items-start mt-2">
       <vs-checkbox class="mx-3" v-model="problemset.enable_team_contest"
         >Enable Team Contest</vs-checkbox
       >
+      <vs-checkbox class="mx-3" v-model="problemset.enable_partial_scoring"
+        >Enable Partial Scoring</vs-checkbox
+      >
     </div>
 
-    <div class="flex flex-column start-content start-items mt-3 mb-1">
-      <span class="mx-3">Problems : </span>
-      <div class="flex start-content start-items">
-        <vs-button class="button mx-3" flat @click="appendProblem"
-          >Add &nbsp;<i class="bx bx-plus"></i
+    <div class="flex flex-col justify-start items-start mb-1 w-full">
+      <div class="flex justify-end items-start w-full">
+        <vs-button class="button mx-3" border flat @click="appendProblem"
+          >Add Problem &nbsp;<i class="bx bx-plus"></i
         ></vs-button>
       </div>
     </div>
 
-    <div class="flex flex-column start-items">
-      <div
-        v-for="(problem, i) in problemset.problems"
-        :key="i"
-        class="flex start-content centered-items mt-2"
-      >
-        <vs-select
-          filter
-          border
-          class="mx-3"
-          placeholder="OJ Name"
-          v-model="problem.oj_problem.oj_name"
+    <div
+      class="
+        flex flex-col
+        items-center
+        w-full
+        border-2 border-gray-200
+        my-4
+        rounded-lg
+        py-4
+      "
+    >
+      <span class="text-left text-gray-500 mb-2">Problems</span>
+      <template v-if="problemset.problems.length > 0">
+        <div
+          v-for="(problem, i) in problemset.problems"
+          :key="i"
+          class="flex justify-start items-center mt-2 w-full"
         >
-          <vs-option label="Atcoder" value="Atcoder">Atcoder</vs-option>
-          <vs-option label="Codechef" value="Codechef">Codechef</vs-option>
-          <vs-option label="Codeforces" value="Codeforces"
-            >Codeforces</vs-option
+          <vs-select
+            filter
+            border
+            class="mx-3"
+            placeholder="OJ Name"
+            v-model="problem.oj_problem.oj_name"
           >
-          <vs-option label="CSES" value="CSES">CSES</vs-option>
-          <vs-option label="DMOJ" value="DMOJ">DMOJ</vs-option>
-          <vs-option label="Gym" value="Gym">Gym</vs-option>
-          <vs-option label="Kattis" value="Kattis">Kattis</vs-option>
-          <vs-option label="OjUz" value="OjUz">OjUz</vs-option>
-          <vs-option label="SPOJ" value="SPOJ">SPOJ</vs-option>
-          <vs-option label="TLX" value="TLX">TLX</vs-option>
-          <vs-option label="UVA" value="UVA">UVA</vs-option>
-        </vs-select>
-        <vs-input
-          @change="fetchOJProblem(problem)"
-          border
-          placeholder="Problem ID"
-          class="mx-3"
-          v-model="problem.oj_problem.oj_problem_code"
-        ></vs-input>
-        <vs-button
-          transparent
-          :loading="problem.isFetchingData"
-          @click="fetchOJProblem(problem)"
-        >
-          <i class="bx bx-refresh"></i>
-        </vs-button>
-        <span
-          class="mt-2"
-          style="min-width: 20%; max-width: 20%; text-overflow: ellipsis"
-        >
-          {{ problem.oj_problem.oj_problem_title }}
-        </span>
-        <vs-button
-          color="danger"
-          flat
-          active
-          @click="removeProblem(problem, i)"
-        >
-          <i class="bx bx-trash"></i>
-        </vs-button>
-      </div>
+            <vs-option label="Atcoder" value="Atcoder">Atcoder</vs-option>
+            <vs-option label="Codeforces" value="Codeforces"
+              >Codeforces</vs-option
+            >
+            <vs-option label="Gym" value="Gym">Gym</vs-option>
+            <vs-option label="OjUz" value="OjUz">OjUz</vs-option>
+            <vs-option label="TLX" value="TLX">TLX</vs-option>
+          </vs-select>
+          <vs-input
+            @change="fetchOJProblem(problem)"
+            border
+            placeholder="Problem ID"
+            class="mx-3"
+            v-model="problem.oj_problem.oj_problem_code"
+          ></vs-input>
+          <vs-button
+            transparent
+            :loading="problem.isFetchingData"
+            @click="fetchOJProblem(problem)"
+          >
+            <i class="bx bx-refresh"></i>
+          </vs-button>
+          <span
+            class="mt-2"
+            style="min-width: 20%; max-width: 20%; text-overflow: ellipsis"
+          >
+            {{ problem.oj_problem.oj_problem_title }}
+          </span>
+          <vs-button
+            color="danger"
+            flat
+            active
+            @click="removeProblem(problem, i)"
+          >
+            <i class="bx bx-trash"></i>
+          </vs-button>
+        </div>
+      </template>
+      <template v-else class="flex w-full justify-center">
+        <span class="text-center text-gray-500">(No problem added)</span>
+      </template>
     </div>
 
-    <div class="flex end-content start-items mt-5">
+    <div class="flex justify-end items-start mt-5 w-full">
       <vs-button class="button" color="danger" transparent @click="closeDialog"
         >Cancel</vs-button
       >
@@ -137,7 +149,7 @@
           problemset.start_time.length === ''
         "
         flat
-        active
+        success
         @click="submitForm"
         >Finish</vs-button
       >

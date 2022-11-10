@@ -1,15 +1,15 @@
 <template>
-  <div class="flex start-content centered-items pt-5 flex-column" style="height: 100%; min-height: 100vh">
+  <div class="flex justify-start items-center pt-5 flex-col" style="height: 100%; min-height: 100vh">
     <div class="mt-3">
       <h3>Pick a problemset</h3>
     </div>
-    <div class="flex centered-items mt-3" style="max-height: 5vh">
+    <div class="flex items-center mt-3" style="max-height: 5vh">
       <vs-button transparent :active="menuTab === 0" @click="menuTab = 0">General</vs-button>
       <vs-button transparent :active="menuTab === 1" @click="menuTab = 1">My Problemset</vs-button>
     </div>
     <div class="flex mb-5" style="min-width: 40vw">
       <!-- <div :class="$vuetify.breakpoint.mdAndUp ? 'grid' : 'grid' "> -->
-      <div class="flex flex-column centered-items start-content mb-5">
+      <div class="flex flex-col items-center justify-start mb-5">
         <ProblemsetAddDialog />
         <vs-table class="mt-3" ref="theProblemsetTable" striped>
           <template #header>
@@ -37,7 +37,7 @@
               :key="i"
               v-for="(problemset, i) in $vs.getPage($vs.getSearch(problemSets, searchProblemset), page, max)"
             >
-              <vs-td class="flex flex-column centered" 
+              <vs-td class="flex flex-col items-center justify-center" 
                 style="min-width: 25%; text-align: center; min-height: 80px"
                 :style="problemset.is_public_leaderboard_enabled ? 'min-height: 100px' : problemset.priority_index > 1 ? 'min-height: 125px' : ''"
               >
@@ -57,7 +57,7 @@
                 {{ getDurationText(problemset.duration_seconds) }}
               </vs-td>
               <vs-td style="min-width: 25%; text-align: center"> 
-                <div class="flex flex-column centered-items end-content">
+                <div class="flex flex-col items-center justify-end">
                   <vs-button  
                     class="mr-3 button" 
                     block
@@ -95,70 +95,7 @@
             <vs-pagination v-model="page" :length="$vs.getLength($vs.getSearch(problemSets), max)" />
           </template>
         </vs-table>
-        <div 
-          v-if="useOldUI"
-          v-for="(problemset, i) in problemSets" 
-          :key="i" 
-          class="problem-card flex-column flex pt-4 pb-2 mb-4"
-          :class="problemset.priority_index > 1 ? timer ? 'glowing-red' : 'glowing-green' : 'shadow'">
-          <div class="flex space-between">
-            <h4 class="ml-3 mr-3">{{problemset.title}}</h4>
-            <vs-switch v-if="menuTab === 1" class="mr-3" :value="problemset.is_active" success @change="toggle(problemset)"></vs-switch>
-            <vs-button v-else @click="registerContest(problemset)" class="mx-3" size="small" transparent color="dark">
-              Register
-            </vs-button>
-          </div>
-          <p class="ml-3 mr-3">{{problemset.description}}</p>
-          <span class="ml-3">
-            Starts : 
-            <i class='bx bx-calendar'></i> {{ $moment(problemset.start_at).format('ddd, DD MMM YYYY') }} - {{ $moment(problemset.start_at).format('HH:mm') }}
-          </span>
-          <span v-if="!problemset.enable_virtual_contest" class="ml-3 mr-3">
-            Ends &nbsp;&nbsp;: 
-            <i class='bx bx-calendar'></i> {{ $moment(problemset.start_at).add(problemset.duration_seconds, 'seconds').format('ddd, DD MMM YYYY') }} - {{ $moment(problemset.start_at).add(problemset.duration_seconds, 'seconds').format('HH:mm') }}
-          </span>
-          <span v-else class="ml-3 mr-3">
-            Ends &nbsp;&nbsp;: 
-            <i class='bx bx-calendar'></i> {{ $moment(problemset.virtual_contest_end_at).format('ddd, DD MMM YYYY') }} - {{ $moment(problemset.virtual_contest_end_at).format('HH:mm') }}
-          </span>
-          <span class="ml-3 mr-3">
-            Time &nbsp;&nbsp;: <i class='bx bx-time'></i> {{ getDurationText(problemset.duration_seconds) }}
-          </span>
-          <span v-if="problemset.priority_index > 1 && timer" class="mt-3" style="text-align:center; font-size: 14px;">
-            Before the Contest
-          </span>
-          <span v-if="problemset.priority_index > 1 && timer" class="timer mb-3" :style="getTimerStyle(timer)">
-            {{getHour(timer)}}:{{getMinute(timer)}}:{{getSecond(timer)}}
-          </span>
-          <div class="flex space-between">
-            <div class="flex centered-items start-content">
-              <vs-button @click="copyToClipboard(problemset)" class="ml-3" size="small" transparent color="dark">
-                <i class="bx bx-link"></i>
-                COPY LINK
-              </vs-button>
-            </div>
-            <div class="flex centered-items end-content">
-              <vs-button  
-                class="mb-3 mr-3 button" 
-                @click="goToLeaderboard(problemset)"
-                v-if="problemset.is_public_leaderboard_enabled"
-                flat active
-              >
-                Leaderboard
-              </vs-button>
-              <vs-button  
-                class="mb-3 mr-3 button" 
-                style="min-width: 25%;"
-                @click="isShowingStartDialog = !isShowingStartDialog; selectedProblemset = problemset; slug = problemset.slug; duration = problemset.duration_seconds;"
-                :disabled="isDisabled(problemset)"
-                :color="isDisabled(problemset) ? 'danger' : 'success'"
-                flat active
-              >
-                {{isDisabled(problemset) ? getText(problemset) : 'Start' + (problemset.enable_virtual_contest ? ' Virtual Contest' : '')}}
-              </vs-button>
-            </div>
-          </div>
-        </div>
+        
       </div>
       <vs-dialog prevent-close width="750px" v-model="isShowingTeamFormDialog" class="pa-3">
         <template #header>
@@ -166,8 +103,8 @@
             Select or Create a Team
           </h4>
         </template>
-        <div class="flex flex-column">
-          <div class="flex end-content">
+        <div class="flex flex-col">
+          <div class="flex justify-end">
             <vs-button v-if="!isCreatingNewTeam" class="button mb-3" transparent @click="createNewTeam">
               <i class="bx bx-plus"></i>
               Create New Team 
@@ -178,7 +115,7 @@
             </vs-button>
           </div>
 
-          <div v-if="isCreatingNewTeam" class="flex flex-column start-items start-content mb-5 ml-3">
+          <div v-if="isCreatingNewTeam" class="flex flex-col items-start justify-start mb-5 ml-3">
             <div class="flex space-between">
               <vs-input v-model="team.name" border label="Team Name" placeholder="Team Name"></vs-input>
               <vs-button :disabled="team.members.length === 3" class="mb-3" transparent @click="addNewMember" color="primary">
@@ -186,7 +123,7 @@
                 Add New Member
               </vs-button>
             </div>
-            <div class="flex start-content mt-5" >
+            <div class="flex justify-start mt-5" >
               <div class="flex" v-for="(member, i) in team.members" :key="i">
                 <vs-input :disabled="i===0" icon-after class="mr-3" border :label="`Member ${i+1} Email`" :placeholder="`Member ${i+1} Email`" v-model="team.members[i]">
                 </vs-input>
@@ -223,7 +160,7 @@
               <vs-pagination v-model="teamPage" :length="$vs.getLength($vs.getSearch(myTeams), teamMax)" />
             </template>
           </vs-table>
-          <div class="flex centered mt-5">
+          <div class="flex items-center justify-center mt-5">
             <vs-button class="button" :transparent="theme !== 'dark'" @click="isShowingTeamFormDialog=false" color="dark">
               Batal
             </vs-button>
@@ -270,7 +207,7 @@
 
 
         <template #footer>
-          <div class="flex centered">
+          <div class="flex items-center justify-center">
             <vs-button class="button" @click="isShowingStartDialog=false" dark size="large" :transparent="theme !== 'dark'">
               BATAL
             </vs-button>
@@ -293,7 +230,6 @@ export default {
       searchProblemset: "",
       page: 1,
       max: 10,
-      useOldUI: false,
       problemSets: [],
       timer: {},
       isShowingStartDialog: false,

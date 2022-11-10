@@ -1,9 +1,6 @@
 <template>
-  <div
-    v-if="sourceCode.length > 0"
-    class="flex centered-items pt-3 flex-column"
-  >
-    <div class="flex pa-3 box centered-content">
+  <div v-if="sourceCode.length > 0" class="flex items-center pt-3 flex-col">
+    <div class="flex pa-3 box justify-center">
       <editor
         class="code-editor"
         v-model="sourceCode"
@@ -17,7 +14,7 @@
     </div>
   </div>
   <div v-else>
-    <div class="flex flex-column centered fullscreen">
+    <div class="flex flex-col items-center justify-center fullscreen">
       <h3>Belum ada data</h3>
       <lottie
         :width="256"

@@ -31,6 +31,10 @@ export default {
       },
       {
         rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Lato&display=swap",
+      },
+      {
+        rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap",
       },
     ]
@@ -43,6 +47,7 @@ export default {
     'vuetify/dist/vuetify.min.css',
     'latex2js/latex2js.css',
     '@/assets/css/main.scss',
+    '@/assets/css/main.css',
     { src: '~/node_modules/highlight.js/styles/hopscotch.css', lang: 'css' },
   ],
 
@@ -70,6 +75,7 @@ export default {
   buildModules: [
     '@nuxtjs/moment',
     '@nuxtjs/dotenv',
+    '@nuxt/postcss8',
   ],
   
   moment: {
@@ -128,6 +134,12 @@ export default {
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    postcss: {
+      plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
+      },
+    },
   },
   auth: {
     redirect: {

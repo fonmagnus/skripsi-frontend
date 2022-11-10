@@ -1,14 +1,22 @@
 <template>
-  <div class="flex flex-column">
-    <div class="flex flex-column start-content start-items pa-2" style="width: 20vw">
-      <div :ref="`profileHoverBox-${unique}`" class="flex start-content my-2" v-for="(profile, i) in profiles" :key="i">
+  <div class="flex flex-col">
+    <div
+      class="flex flex-col justify-start items-start pa-2"
+      style="width: 20vw"
+    >
+      <div
+        :ref="`profileHoverBox-${unique}`"
+        class="flex justify-start my-2"
+        v-for="(profile, i) in profiles"
+        :key="i"
+      >
         <vs-avatar circle>
-          <img :src="getPhoto(profile)" alt="">
+          <img :src="getPhoto(profile)" alt="" />
         </vs-avatar>
-        <div class="flex flex-column mx-3 start-items start-content">
-          <h5 style="text-align: left">{{profile.name}}</h5>
+        <div class="flex flex-col mx-3 items-start justify-start">
+          <h5 style="text-align: left">{{ profile.name }}</h5>
           <small style="text-align: left">
-            {{profile.school_name}}
+            {{ profile.school_name }}
           </small>
         </div>
       </div>
@@ -20,7 +28,7 @@
 export default {
   props: {
     profileProps: {
-      type: Object, 
+      type: Object,
       required: true,
     },
     isTeam: {
@@ -36,47 +44,50 @@ export default {
     return {
       profiles: [],
       isFetching: false,
-    }
+    };
   },
   mounted() {
-    
     if (this.isTeam && !isNaN(this.profileProps.email)) {
       this.$services.problem
-        .getTeamMembers(this.profileProps.email, this.$auth.getToken('local'))
-        .then(response => {
-          response.forEach(user => {
+        .getTeamMembers(this.profileProps.email, this.$auth.getToken("local"))
+        .then((response) => {
+          response.forEach((user) => {
             this.profiles.push({
               email: user.email,
               username: user.username,
               name: user.name,
               school_name: user.school_name,
-              profile_photo: user.profile_photo
-            })
-          })
-        })
-    }
-    else {
+              profile_photo: user.profile_photo,
+            });
+          });
+        });
+    } else {
       this.$services.account
-        .getUserByIdOrUsername(this.profileProps.email, this.$auth.getToken('local'))
-        .then(result => {
-          this.profiles = [{
-            email: result.email,
-            username: result.username,
-            name: result.name,
-            school_name: result.school_name,
-            profile_photo: result.profile_photo
-          }]
-        })
+        .getUserByIdOrUsername(
+          this.profileProps.email,
+          this.$auth.getToken("local")
+        )
+        .then((result) => {
+          this.profiles = [
+            {
+              email: result.email,
+              username: result.username,
+              name: result.name,
+              school_name: result.school_name,
+              profile_photo: result.profile_photo,
+            },
+          ];
+        });
     }
   },
   methods: {
     getPhoto(user) {
-      if(user) {
-        return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/${user.profile_photo}`
+      if (user) {
+        return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/${user.profile_photo}`;
       } else {
-        return `https://ui-avatars.com/api/?name=${user.name}&background=random`
+        return `https://ui-avatars.com/api/?name=${user.name}&background=random`;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

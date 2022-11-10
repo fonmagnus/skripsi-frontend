@@ -1,7 +1,7 @@
 <template>
   <div class="flex" v-if="problems.length > 0 && $vuetify.breakpoint.xsOnly">
-    <div class="flex flex-column centered-content mb-5">
-      <div class="flex flex-column centered-items start-content mb-3">
+    <div class="flex flex-col justify-center mb-5">
+      <div class="flex flex-col items-center justify-start mb-3">
         <h3>{{ problemset.title }}</h3>
         <span> Time Left <br /> </span>
         <span
@@ -14,7 +14,7 @@
           Melihat soal no. {{ this.selectedIdx + 1 }} /
           {{ this.problems.length }}
         </span>
-        <div class="flex centered">
+        <div class="flex items-center justify-center">
           <vs-button
             v-for="(problem, i) in problems"
             :key="i"
@@ -61,14 +61,7 @@
   <div v-else-if="problems.length && $vuetify.breakpoint.smAndUp">
     <div class="flex layout-container">
       <div
-        class="
-          admin__filter
-          px-5
-          pt-5
-          flex flex-column
-          centered-items
-          start-content
-        "
+        class="admin__filter px-5 pt-5 flex flex-col items-center justify-start"
         @keydown.up="prevProblem"
         @keydown.down="nextProblem"
       >
@@ -104,7 +97,7 @@
           </p>
         </vs-button>
       </div>
-      <div class="admin__viewer flex centered-items">
+      <div class="admin__viewer flex items-center">
         <ContestProblemCard
           v-for="(p, i) in problems"
           :key="i"
@@ -116,7 +109,7 @@
           :problemset="problemset"
         />
       </div>
-      <div class="admin__empty flex flex-column"></div>
+      <div class="admin__empty flex flex-col"></div>
     </div>
     <ContestControl
       @nextProblem="nextProblem"

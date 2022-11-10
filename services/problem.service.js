@@ -870,6 +870,19 @@ const ProblemService = {
         })
     );
   },
+
+  getOjProblems(token) {
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.getOjProblems(
+        { headers: { Authorization: token } })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
 };
 
 export default ProblemService;

@@ -1,5 +1,5 @@
 export default function (context) {
   if (context.store.state.auth.loggedIn) {
-    return context.redirect('/problems')
+    return context.redirect('/home')
   }
 }

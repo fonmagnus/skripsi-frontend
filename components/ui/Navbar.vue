@@ -1,6 +1,6 @@
  <template>
   <div
-    class="the-container flex centered-items space-around"
+    class="the-container flex items-center space-around"
     :style="theme === 'dark' ? 'background-color: black' : ''"
   >
     <vs-navbar v-if="$vuetify.breakpoint.mdAndUp" v-model="active" square>
@@ -37,7 +37,7 @@
       <template #right>
         <div
           v-if="hoverMenu"
-          class="flex flex-column shadow"
+          class="flex flex-col shadow"
           :class="`menu${theme === 'dark' ? '--dark' : ''}`"
         >
           <div
@@ -60,7 +60,7 @@
         </vs-avatar>
       </template>
     </vs-navbar>
-    <!-- <div class="flex flex-column menu"
+    <!-- <div class="flex flex-col menu"
     </div> -->
     <Slide :closeOnNavigation="true" class="ml-0 sidebar-menu" v-else>
       <a v-if="$auth.user.role === 'Admin'" style="font-family: Oxygen">
@@ -89,7 +89,7 @@
     </div>
     <div
       v-if="hoverMenu && $vuetify.breakpoint.smAndDown"
-      class="flex flex-column shadow menu"
+      class="flex flex-col shadow menu"
       @mouseleave="removeHoverMenu"
     >
       <div
@@ -101,7 +101,7 @@
         {{ menu.text }}
       </div>
     </div>
-    <div class="flex centered">
+    <div class="flex items-center justify-center">
       <vs-switch
         v-if="$vuetify.breakpoint.smAndDown"
         dark

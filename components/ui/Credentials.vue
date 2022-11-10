@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-column centered-items start-content">
+  <div class="flex flex-col items-center justify-start">
     <vs-button flat active class="button" size="xl" @click="active = !active">
       Login
     </vs-button>
@@ -17,7 +17,7 @@
         <h4 class="not-margin">Login</h4>
       </template>
 
-      <div class="flex flex-column centered-items start-content mt-4">
+      <div class="flex flex-col items-center justify-start mt-4">
         <vs-input v-model="username" placeholder="Email or Username" class="">
           <template #icon> @ </template>
         </vs-input>
@@ -66,7 +66,7 @@
         <h4 class="not-margin">Signup</h4>
       </template>
 
-      <div class="flex flex-column centered-items start-content mt-4">
+      <div class="flex flex-col items-center justify-start mt-4">
         <vs-input v-model="name" placeholder="Nama Lengkap" class="" icon-after>
           <template #icon>
             <i class="bx bx-user"></i>
@@ -165,7 +165,7 @@ export default {
         })
         .then((res) => {
           this.isLoading = false;
-          this.$router.push("/problems");
+          this.$router.push("/home");
         })
         .catch((res) => {
           const noti = this.$vs.notification({
