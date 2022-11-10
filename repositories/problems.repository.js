@@ -382,6 +382,13 @@ export default {
     )
   },
 
+  getOjSubmissions(config = null) {
+    return $axios.get(
+      `${resource}/get-oj-submissions`,
+      config
+    )
+  },
+
   getOjProblem(ojName, ojProblemCode, config = null) {
     return $axios.get(
       `${resource}/get-oj-problem/${ojName}/${ojProblemCode}`,

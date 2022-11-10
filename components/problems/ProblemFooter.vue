@@ -190,7 +190,7 @@
       </vs-table>
     </vs-dialog>
 
-    <vs-dialog v-model="displaySubmissionDetailDialog" width="60vw">
+    <vs-dialog v-model="displaySubmissionDetailDialog" width="80vw">
       Status :
       <span
         :style="formatClassWithoutStatus(submission.verdict)"
@@ -250,7 +250,7 @@
           lang="c_cpp"
           theme="monokai"
           width="3000px"
-          height="600px"
+          height="1024px"
         >
         </editor>
       </div>

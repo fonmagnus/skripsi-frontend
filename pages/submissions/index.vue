@@ -1,174 +1,252 @@
 <template>
-  <div v-if="$auth.user && $vuetify.breakpoint.mdAndUp" class="flex fullscreen">
-    <div class="admin__filter shadow fullscreen items-center pt-5">
-      <SubmissionFilter
-        @fetchData="fetchData"
-        @fetchAnswers="fetchAnswers"
-        :isFetchingSubmissions="isFetchingSubmissions"
-        :submissions="submissions"
-        :problemset="problemset"
-      />
-      <!-- <h1>Test</h1>
-      <h1>Test</h1>
-      <h1>Test</h1> -->
-    </div>
-    <div class="admin__viewer">
-      <SubmissionViewer
-        :slug="slug"
-        :answers="answers"
-        @changeAnswer="changeAnswer"
-        :problemset="problemset"
-        :sourceCode="sourceCode"
-        ref="submissionViewer"
-      />
-    </div>
-  </div>
   <div
-    v-else-if="$auth.user && $vuetify.breakpoint.smAndDown"
-    class="flex flex-col fullscreen pt-5"
+    class="
+      flex flex-col
+      py-32
+      sm:py-24
+      md:py-16
+      w-full
+      px-8
+      md:px-12
+      lg:px-16
+      gap-6
+      items-center
+    "
   >
-    <div>
-      <SubmissionFilter
-        @fetchData="fetchData"
-        @fetchAnswers="fetchAnswers"
-        :isFetchingSubmissions="isFetchingSubmissions"
-        :submissions="submissions"
-        :problemset="problemset"
-      />
-      <SubmissionViewer
-        :slug="slug"
-        :answers="answers"
-        :problemset="problemset"
-        :sourceCode="sourceCode"
-        @changeAnswer="changeAnswer"
-        ref="submissionViewer"
-      />
-    </div>
+    <h3>Submissions</h3>
+    <vs-table>
+      <template #thead>
+        <vs-th>ID (Click to View)</vs-th>
+        <vs-th>Submitted At</vs-th>
+        <vs-th>OJ Name</vs-th>
+        <vs-th>OJ Problem Code</vs-th>
+        <vs-th>Title</vs-th>
+        <vs-th>Username</vs-th>
+        <vs-th>Verdict</vs-th>
+        <vs-th>Score</vs-th>
+      </template>
+
+      <template #tbody>
+        <vs-tr :key="i" v-for="(tr, i) in submissions">
+          <vs-td>
+            <a href="#" @click="viewSubmissionDetail(tr.id)">
+              {{ tr.id }}
+            </a>
+          </vs-td>
+          <vs-td>{{
+            $moment(tr.submitted_at).format("DD MMM YYYY HH:mm:ss")
+          }}</vs-td>
+          <vs-td>{{ tr.oj_name }}</vs-td>
+          <vs-td>{{ tr.oj_problem_code }}</vs-td>
+          <vs-td>
+            <a
+              :href="`/problems/${tr.oj_name}/${tr.oj_problem_code}`"
+              target="_blank"
+            >
+              {{ tr.oj_problem_title }}
+            </a>
+          </vs-td>
+          <vs-td>{{ tr.user.username }}</vs-td>
+          <vs-td>
+            <span
+              class="font-bold"
+              :class="[
+                {
+                  'text-green-500': tr.verdict === 'Accepted',
+                  'text-red-500': tr.verdict !== 'Accepted',
+                },
+              ]"
+            >
+              {{ tr.verdict }}
+            </span>
+          </vs-td>
+          <vs-td>
+            <span
+              class="font-bold"
+              :class="[
+                {
+                  'text-green-500': tr.verdict === 'Accepted',
+                  'text-red-500': tr.verdict !== 'Accepted',
+                },
+              ]"
+            >
+              {{ tr.score }}
+            </span>
+          </vs-td>
+        </vs-tr>
+      </template>
+    </vs-table>
+    <vs-pagination
+      circle
+      v-model="page"
+      :length="metadata.total_page"
+    ></vs-pagination>
+
+    <vs-dialog v-model="displaySubmissionDetailDialog" width="80vw">
+      Status :
+      <span
+        :style="formatClassWithoutStatus(submission.verdict)"
+        class="verdict"
+      >
+        {{ submission.verdict + " (Score: " + submission.score + ")" }}
+      </span>
+      <div
+        v-if="subtaskResults && subtaskResults.length > 0"
+        class="flex items-center justify-center mt-3"
+      >
+        <vs-table striped>
+          <template #thead>
+            <vs-tr>
+              <vs-th style="width: 10%"> Subtask </vs-th>
+              <vs-th style="width: 20%"> Result </vs-th>
+              <vs-th style="width: 10%"> Score </vs-th>
+              <vs-th> </vs-th>
+            </vs-tr>
+          </template>
+          <template #tbody>
+            <vs-tr :key="i" v-for="(tr, i) in subtaskResults" :data="tr">
+              <vs-td style="width: 10%">
+                {{ i + 1 }}
+              </vs-td>
+              <vs-td style="width: 20%">
+                <span
+                  :style="formatClassWithoutStatus(tr.verdict)"
+                  class="verdict"
+                >
+                  {{ tr.verdict }}
+                </span>
+              </vs-td>
+              <vs-td style="width: 10%">
+                <span
+                  :style="formatClassWithoutStatus(tr.verdict)"
+                  class="verdict"
+                >
+                  {{ tr.score }}
+                </span>
+              </vs-td>
+              <vs-td></vs-td>
+            </vs-tr>
+          </template>
+
+          <template #notFound> (Belum ada submission) </template>
+        </vs-table>
+      </div>
+      <div
+        class="flex items-center justify-center mt-3"
+        ref="theSubmissionDetail"
+      >
+        <editor
+          class="code-editor"
+          v-model="submission.source_code"
+          @init="editorInit"
+          lang="c_cpp"
+          theme="monokai"
+          width="3000px"
+          height="1024px"
+        >
+        </editor>
+      </div>
+    </vs-dialog>
   </div>
 </template>
 
 <script>
 export default {
+  components: {
+    editor: require("vue2-ace-editor"),
+  },
   data() {
     return {
-      slug: "",
-      answers: [],
-      problemset: {},
       submissions: [],
-      isFetchingSubmissions: false,
-      isFetchingData: {},
-      sourceCode: "",
-      loadingTypes: [
-        "waves",
-        "corners",
-        "points",
-        "square",
-        "rectangle",
-        "circles",
-        "square-rotate",
-        "scale",
-      ],
+      metadata: {
+        total_page: 1,
+      },
+      page: 1,
+      limit: 50,
+
+      submission: {},
+      subtaskResults: [],
+      displaySubmissionDetailDialog: false,
     };
   },
+  mounted() {
+    this.fetchSubmissions();
+  },
+  watch: {
+    page(val) {
+      this.fetchSubmissions();
+    },
+  },
   methods: {
-    fetchData(slug, my = true) {
-      this.slug = slug;
+    editorInit: function () {
+      require("brace/mode/c_cpp"); //language
+      require("brace/snippets/c_cpp"); //snippet
+      require("brace/theme/monokai");
+    },
+    fetchSubmissions() {
       this.$services.problem
-        .getProblemsetMeta(slug, this.$auth.getToken("local"))
+        .getOjSubmissions(
+          {
+            limit: this.limit,
+            offset: (this.page - 1) * this.limit,
+          },
+          this.$auth.getToken("local")
+        )
         .then((response) => {
-          this.fetchSubmissions(slug, response, my);
-          this.fetchAnswers(0);
+          this.submissions = response.data;
+          this.metadata = response.metadata;
         });
     },
-    fetchSubmissions(slug, problemset, my = true) {
-      if (my) {
-        this.$services.problem
-          .getMySubmissions(slug, this.$auth.getToken("local"))
-          .then((response) => {
-            this.isFetchingSubmissions = false;
-            this.submissions = response;
-            this.problemset = problemset;
-          });
-      } else {
-        this.$services.problem
-          .getSubmissions(slug, this.$auth.getToken("local"))
-          .then((response) => {
-            this.isFetchingSubmissions = false;
-            this.submissions = response;
-            this.problemset = problemset;
-          });
-      }
-    },
-    fetchAnswers(submission_id = 0, my = true) {
-      if (submission_id === 0) return;
-      this.isFetchingData = this.$vs.loading({
-        type: this.loadingTypes[
-          Math.floor(Math.random() * this.loadingTypes.length)
-        ],
-        target: this.$refs["submissionViewer"][0],
-      });
 
-      if (this.problemset.type === "MIXED") {
-        if (my) {
-          this.$services.problem
-            .getMyAnswers(submission_id, this.$auth.getToken("local"))
-            .then((response) => {
-              this.answers = response;
-            })
-            .finally((response) => {
-              this.isFetchingData.close();
-            });
-        } else {
-          this.$services.problem
-            .getAnswers(submission_id, this.$auth.getToken("local"))
-            .then((response) => {
-              this.answers = response;
-            })
-            .finally((response) => {
-              this.isFetchingData.close();
-            });
-        }
-      } else if (this.problemset.type === "FULL_CODING") {
-        this.$services.problem
-          .getOJSubmissionDetail(submission_id, this.$auth.getToken("local"))
-          .then((response) => {
-            this.sourceCode = response.source_code;
-          })
-          .finally((response) => {
-            this.isFetchingData.close();
-          });
-      } else if (this.problemset.type === "INTERNAL_CODING") {
-        this.$services.problem
-          .getCodingSubmissionDetail(
-            submission_id,
-            this.$auth.getToken("local")
-          )
-          .then((response) => {
-            this.sourceCode = response.source_code;
-          })
-          .finally((response) => {
-            this.isFetchingData.close();
-          });
-      }
+    viewSubmissionDetail(id) {
+      this.displaySubmissionDetailDialog = true;
+      this.$services.problem
+        .getOJSubmissionDetail(id, this.$auth.getToken("local"))
+        .then((response) => {
+          this.submission = response;
+          this.subtaskResults = JSON.parse(this.submission.subtask_results);
+        });
     },
-    changeAnswer(param) {
-      this.answers[param.i].score = parseFloat(param.answer);
+    formatClassWithoutStatus(verdict) {
+      if (verdict === "Accepted") {
+        return "color: #45c93a";
+      } else {
+        return "color: #ff4658";
+      }
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.admin {
-  &__filter {
-    left: 0;
-    width: 30%;
-    overflow-y: scroll;
-  }
-  &__viewer {
-    right: 0;
-    overflow-y: scroll;
-    width: 70%;
-  }
+.layout-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 2vh;
+  background-color: #fff;
+}
+.layout-container--dark {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 2vh;
+  background-color: black;
+  color: white;
+}
+.code-editor {
+  z-index: 0;
+  font-size: 14px;
+}
+.code-editor ::v-deep span {
+  font-family: "Ubuntu Mono";
+}
+.verdict {
+  font-weight: 700 !important;
+}
+.clickable {
+  cursor: pointer;
 }
 </style>

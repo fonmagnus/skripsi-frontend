@@ -10,7 +10,6 @@
         </h3>
       </template>
       <vs-navbar-item
-        v-if="$auth.user.role === 'Admin'"
         :active="active.includes('home')"
         id="home"
         @click="$router.push('/home')"
@@ -63,7 +62,7 @@
     <!-- <div class="flex flex-col menu"
     </div> -->
     <Slide :closeOnNavigation="true" class="ml-0 sidebar-menu" v-else>
-      <a v-if="$auth.user.role === 'Admin'" style="font-family: Oxygen">
+      <a style="font-family: Oxygen">
         <span @click="$router.push('/home')">Home</span>
       </a>
       <a style="font-family: Oxygen">

@@ -13,7 +13,7 @@
       gap-6
     "
   >
-    <div class="col-span-1 flex flex-col border border-gray-200 px-2 py-6">
+    <div class="col-span-1 flex flex-col px-2 py-6">
       <span>Filter Problems</span>
       <div class="flex flex-col mt-8 shrink">
         <span class="text-sm mb-2">Online Judge</span>
@@ -92,8 +92,34 @@
             </div>
 
             <div class="flex justify-end items-center max-h-8">
-              <span class="rounded-xl text-xs py-1 px-2 bg-blue-500 text-white">
-                Difficulty :
+              <span
+                class="rounded-xl text-sm py-1 px-2 text-white"
+                :class="[
+                  {
+                    'bg-gray-400':
+                      0 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 1200,
+                    'bg-green-600':
+                      1200 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 1400,
+                    'bg-cyan-500':
+                      1400 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 1600,
+                    'bg-blue-600':
+                      1600 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 1900,
+                    'bg-purple-500':
+                      1900 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 2100,
+                    'bg-orange-300':
+                      2100 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 2400,
+                    'bg-red-500':
+                      2400 <= parseInt(problem.difficulty) &&
+                      parseInt(problem.difficulty) < 3500,
+                  },
+                ]"
+              >
                 <b>{{ problem.difficulty ? problem.difficulty : "N/A" }}</b>
               </span>
             </div>
@@ -137,11 +163,24 @@ export default {
       animationOptions: {
         animationData: animation.default,
       },
+      resetPage: false,
     };
   },
   watch: {
     page(val) {
       this.fetchProblems();
+    },
+    filter: {
+      handler(val) {
+        this.resetPage = true;
+      },
+      deep: true,
+    },
+    "filter.oj_names": {
+      handler(val) {
+        this.resetPage = true;
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -149,6 +188,10 @@ export default {
   },
   methods: {
     fetchProblems() {
+      if (this.resetPage) {
+        this.page = 1;
+        this.resetPage = false;
+      }
       this.isFetchingProblems = true;
       this.$services.problem
         .getOjProblems(
