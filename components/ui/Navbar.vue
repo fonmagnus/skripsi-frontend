@@ -19,12 +19,12 @@
         Home
       </vs-navbar-item>
       <vs-navbar-item
-        :active="active.includes('problems')"
-        id="problems"
-        @click="$router.push('/problems')"
+        :active="active.includes('practice')"
+        id="practice"
+        @click="$router.push('/practice')"
         class="item"
       >
-        Problems
+        Practice
       </vs-navbar-item>
       <vs-navbar-item
         :active="active.includes('submissions')"
@@ -67,7 +67,7 @@
         <span @click="$router.push('/home')">Home</span>
       </a>
       <a style="font-family: Oxygen">
-        <span @click="$router.push('/problems')">Problems</span>
+        <span @click="$router.push('/practice')">practice</span>
       </a>
       <a style="font-family: Oxygen">
         <span @click="$router.push('/submissions')">Submissions</span>

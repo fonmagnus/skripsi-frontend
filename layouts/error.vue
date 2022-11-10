@@ -11,7 +11,7 @@
     />
     <NuxtLink to="/problems">
       <vs-button size="large" class="button" danger border>
-        Kembali ke Halaman Utama
+        Back to Home
       </vs-button>
     </NuxtLink>
   </div>

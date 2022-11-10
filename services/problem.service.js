@@ -871,10 +871,13 @@ const ProblemService = {
     );
   },
 
-  getOjProblems(token) {
+  getOjProblems(params, token) {
     return new Promise((resolve, reject) =>
       ProblemsRepository.getOjProblems(
-        { headers: { Authorization: token } })
+        { 
+          headers: { Authorization: token },
+          params,
+        })
         .then(({ data }) => {
           resolve(data);
         })
