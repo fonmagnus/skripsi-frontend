@@ -71,7 +71,7 @@
           "
           :href="`/problems/${problem.oj_name}/${problem.oj_problem_code}`"
         >
-          <span class="font-bold text-blue-600">
+          <span class="font-bold text-blue-600 text-lg">
             {{ problem.title }}
           </span>
           <span class="text-sm">
