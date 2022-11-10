@@ -381,4 +381,11 @@ export default {
       config
     )
   },
+
+  getOjProblem(ojName, ojProblemCode, config = null) {
+    return $axios.get(
+      `${resource}/get-oj-problem/${ojName}/${ojProblemCode}`,
+      config
+    )
+  },
 };

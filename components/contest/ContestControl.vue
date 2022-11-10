@@ -60,9 +60,7 @@
     </vs-button>
     <vs-dialog v-model="displaySubmitDialog" width="60vw">
       <template #header>
-        <h4 class="mt-3">
-          Silakan copy-paste source code (C++) milikmu di bawah ini 👇
-        </h4>
+        <h4 class="mt-3">Copy and Paste your C++ Solution here</h4>
       </template>
       <div class="flex flex-col">
         <div class="flex justify-end">

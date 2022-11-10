@@ -9,7 +9,7 @@
       :options="lottieOptions"
       v-on:animCreated="handleAnimation"
     />
-    <NuxtLink to="/problems">
+    <NuxtLink to="/practice">
       <vs-button size="large" class="button" danger border>
         Back to Home
       </vs-button>

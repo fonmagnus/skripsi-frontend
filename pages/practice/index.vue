@@ -357,9 +357,9 @@ export default {
       }
 
       if (this.selectedProblemset.type !== "MIXED") {
-        this.$router.push(`/problems/contest/${this.slug}`);
+        this.$router.push(`/practice/contest/${this.slug}`);
       } else {
-        this.$router.push(`/problems/${this.slug}`);
+        this.$router.push(`/practice/${this.slug}`);
       }
     },
     isDisabled(problemset) {

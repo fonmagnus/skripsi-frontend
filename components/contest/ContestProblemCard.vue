@@ -66,35 +66,11 @@
         v-if="renderable"
         :content="readMD(problem.oj_problem.body)"
         :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
+        class="p-8 border border-gray-100 rounded-lg"
       ></latex>
       <div
         v-else
         v-html="readMD(problem.oj_problem.body)"
-        class="ml-3 mt-3"
-        :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
-      ></div>
-      <!-- <span v-else>Not renderable</span> -->
-    </div>
-    <div v-else-if="problem.coding_problem" class="mx-3 flex flex-col">
-      <!-- <span v-html="readMD(problem.coding_problem.body)" class="html-container"></span> -->
-      <latex
-        :key="latex"
-        v-if="renderable"
-        :content="
-          lang === 'ID'
-            ? readMD(problem.coding_problem.body)
-            : readMD(problem.coding_problem.body_en)
-        "
-        :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
-      ></latex>
-      <div
-        :key="latex"
-        v-else
-        v-html="
-          lang === 'ID'
-            ? readMD(problem.coding_problem.body)
-            : readMD(problem.coding_problem.body_en)
-        "
         class="ml-3 mt-3"
         :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
       ></div>
@@ -189,7 +165,6 @@ export default {
       mdData = mdData.replaceAll("</var></pre>", "</var></div>");
       mdData = mdData.replaceAll("<var>", "$$");
       mdData = mdData.replaceAll("</var>", "$$");
-      console.log(mdData);
       return this.$md.render(mdData);
     },
     viewEditorial(p) {
@@ -259,7 +234,7 @@ export default {
 
 @import "~vuetify/src/styles/styles.sass";
 .html-container {
-  background-color: white;
+  background-color: rgb(246, 248, 249);
 }
 
 .html-container--dark {
@@ -290,6 +265,7 @@ export default {
 
 .html-container ::v-deep li {
   margin-left: 24px;
+  list-style-type: disc;
 }
 
 .html-container--dark ::v-deep li {
@@ -298,12 +274,12 @@ export default {
 
 .html-container ::v-deep .section-title {
   font-weight: bold;
-  font-family: "Oxygen";
+  font-family: "Lato";
 }
 
 .html-container--dark ::v-deep .section-title {
   font-weight: bold;
-  font-family: "Oxygen";
+  font-family: "Lato";
 }
 
 .html-container ::v-deep pre {

@@ -886,6 +886,23 @@ const ProblemService = {
         })
     );
   },
+
+  getOjProblem(ojName, ojProblemCode, token) {
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.getOjProblem(
+        ojName,
+        ojProblemCode,
+        { 
+          headers: { Authorization: token },
+        })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
 };
 
 export default ProblemService;

@@ -53,7 +53,7 @@
     </div>
     <div class="col-span-3 flex flex-col gap-4">
       <template v-if="!isFetchingProblems">
-        <div
+        <a
           v-for="(problem, i) in problems"
           :key="i"
           class="
@@ -69,6 +69,7 @@
             transition-all
             max-h-36
           "
+          :href="`/problems/${problem.oj_name}/${problem.oj_problem_code}`"
         >
           <span class="font-bold text-blue-600">
             {{ problem.title }}
@@ -78,7 +79,7 @@
           </span>
 
           <div class="flex w-full mt-2 gap-3 justify-between">
-            <div class="flex shrink">
+            <div class="flex gap-2 shrink">
               <div
                 class="bg-gray-100 py-1 px-2 rounded-xl max-h-8"
                 v-for="(tag, j) in problem.tags"
@@ -97,7 +98,7 @@
               </span>
             </div>
           </div>
-        </div>
+        </a>
       </template>
       <template v-else>
         <lottie-player :options="animationOptions" />

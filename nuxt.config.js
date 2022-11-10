@@ -35,6 +35,10 @@ export default {
       },
       {
         rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap",
+      },
+      {
+        rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap",
       },
     ]
