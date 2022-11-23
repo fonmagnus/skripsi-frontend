@@ -1302,6 +1302,9 @@ export default {
   z-index: 0;
   font-size: 14px;
 }
+.code-editor ::v-deep span {
+  font-family: "Ubuntu Mono";
+}
 .verdict {
   font-weight: 700 !important;
 }

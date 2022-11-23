@@ -10,8 +10,8 @@
           <Navbar @toggleTheme="toggleTheme" :theme="theme" />
         </client-only>
       </div>
-      <Nuxt class="child-container" />
     </div>
+    <Nuxt class="child-container" />
   </div>
 </template>
 

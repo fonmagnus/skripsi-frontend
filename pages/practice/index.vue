@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-start items-center pt-5 flex-col" style="height: 100%; min-height: 100vh">
+  <div class="flex justify-start items-center pt-5 flex-col w-full" style="height: 100%; min-height: 100vh">
     <div class="mt-3">
       <h3>Pick a problemset</h3>
     </div>
@@ -7,11 +7,16 @@
       <vs-button transparent :active="menuTab === 0" @click="menuTab = 0">General</vs-button>
       <vs-button transparent :active="menuTab === 1" @click="menuTab = 1">My Problemset</vs-button>
     </div>
-    <div class="flex mb-5" style="min-width: 40vw">
       <!-- <div :class="$vuetify.breakpoint.mdAndUp ? 'grid' : 'grid' "> -->
-      <div class="flex flex-col items-center justify-start mb-5">
-        <ProblemsetAddDialog />
-        <vs-table class="mt-3" ref="theProblemsetTable" striped>
+      <div class="flex flex-col items-center justify-start mb-5 w-full px-6 sm:px-12 md:px-24 lg:px-36">
+        <ProblemsetAddDialog class="shrink"/>
+        <div class="flex flex-col shrink w-full">
+          <span class="font-bold">Hello! Welcome to Vertex! 👋</span>
+          <span>In this page, you can mix your own problemset from various online judges! ❤️</span>
+          <span>It's very simple! Just click on the <span class="text-blue-500 font-bold">Create New Problemset</span> above</span>
+          <span>Oh and by the way, you can also work on various problemsets created by other users as well! Happy practice!</span>
+        </div>
+        <vs-table class="mt-3 w-full" ref="theProblemsetTable" striped>
           <template #header>
             <vs-input v-model="searchProblemset" border placeholder="Search Problemset" />
           </template>
@@ -217,7 +222,6 @@
           </div>
         </template>
       </vs-dialog>
-    </div>
     <!-- <ProblemsetAddDialog v-if="$auth.user.role === 'Admin' || $auth.user.role === 'Member'"/> -->
   </div>
 </template>

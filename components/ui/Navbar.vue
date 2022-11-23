@@ -279,9 +279,9 @@ export default {
       });
     },
     getPhoto(user) {
-      if (user) {
+      if (user && user.profile_photo) {
         return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/${user.profile_photo}`;
-      } else {
+      } else if (user) {
         return `https://ui-avatars.com/api/?name=${user.name}&background=random`;
       }
     },

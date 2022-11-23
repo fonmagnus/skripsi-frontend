@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-end" style="max-height: 6%">
+  <div class="flex justify-end w-full" style="max-height: 6%">
     <vs-button class="button" transparent @click="showAddProblemsetDialog">
       <i class="bx bx-plus"></i>
       Create New Problemset

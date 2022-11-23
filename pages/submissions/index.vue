@@ -14,73 +14,119 @@
     "
   >
     <h3>Submissions</h3>
-    <vs-table>
-      <template #thead>
-        <vs-th>ID (Click to View)</vs-th>
-        <vs-th>Submitted At</vs-th>
-        <vs-th>OJ Name</vs-th>
-        <vs-th>OJ Problem Code</vs-th>
-        <vs-th>Title</vs-th>
-        <vs-th>Username</vs-th>
-        <vs-th>Verdict</vs-th>
-        <vs-th>Score</vs-th>
-      </template>
+    <div class="grid grid-cols-4">
+      <div class="col-span-1">
+        <div class="col-span-1 flex flex-col px-2 py-6">
+          <span>Filter Problems</span>
+          <div class="flex flex-col mt-8 shrink">
+            <span class="text-sm mb-2">Online Judge</span>
+            <vs-checkbox
+              v-for="(oj_name, i) in filterForm.oj_names"
+              :key="i"
+              :val="oj_name"
+              v-model="filter.oj_names"
+            >
+              {{ oj_name }}
+            </vs-checkbox>
+          </div>
+          <div class="flex flex-col mt-8 shrink">
+            <span class="text-sm mb-2">Verdicts</span>
+            <vs-checkbox
+              v-for="(verdict, i) in filterForm.verdicts"
+              :key="i"
+              :val="verdict"
+              v-model="filter.verdicts"
+            >
+              {{ verdict }}
+            </vs-checkbox>
+          </div>
+          <div class="flex flex-col mt-4 shrink">
+            <span class="text-sm mb-2">Problem Code</span>
+            <input
+              label="Problem Code"
+              step="100"
+              v-model="filter.oj_problem_code"
+              class="border px-2 py-1 text-sm"
+            />
+          </div>
 
-      <template #tbody>
-        <vs-tr :key="i" v-for="(tr, i) in submissions">
-          <vs-td>
-            <a href="#" @click="viewSubmissionDetail(tr.id)">
-              {{ tr.id }}
-            </a>
-          </vs-td>
-          <vs-td>{{
-            $moment(tr.submitted_at).format("DD MMM YYYY HH:mm:ss")
-          }}</vs-td>
-          <vs-td>{{ tr.oj_name }}</vs-td>
-          <vs-td>{{ tr.oj_problem_code }}</vs-td>
-          <vs-td>
-            <a
-              :href="`/problems/${tr.oj_name}/${tr.oj_problem_code}`"
-              target="_blank"
-            >
-              {{ tr.oj_problem_title }}
-            </a>
-          </vs-td>
-          <vs-td>{{ tr.user.username }}</vs-td>
-          <vs-td>
-            <span
-              class="font-bold"
-              :class="[
-                {
-                  'text-green-500': tr.verdict === 'Accepted',
-                  'text-red-500': tr.verdict !== 'Accepted',
-                },
-              ]"
-            >
-              {{ tr.verdict }}
-            </span>
-          </vs-td>
-          <vs-td>
-            <span
-              class="font-bold"
-              :class="[
-                {
-                  'text-green-500': tr.verdict === 'Accepted',
-                  'text-red-500': tr.verdict !== 'Accepted',
-                },
-              ]"
-            >
-              {{ tr.score }}
-            </span>
-          </vs-td>
-        </vs-tr>
-      </template>
-    </vs-table>
-    <vs-pagination
-      circle
-      v-model="page"
-      :length="metadata.total_page"
-    ></vs-pagination>
+          <vs-button class="button mt-12" transparent @click="fetchSubmissions">
+            Search &nbsp;
+            <i class="bx bx-search"></i>
+          </vs-button>
+        </div>
+      </div>
+      <div class="col-span-3 relative">
+        <loading-overlay v-if="isFetchingSubmission" />
+        <vs-table>
+          <template #thead>
+            <vs-th>ID (Click to View)</vs-th>
+            <vs-th>Submitted At</vs-th>
+            <vs-th>OJ Name</vs-th>
+            <vs-th>OJ Problem Code</vs-th>
+            <vs-th>Title</vs-th>
+            <vs-th>Username</vs-th>
+            <vs-th>Verdict</vs-th>
+            <vs-th>Score</vs-th>
+          </template>
+
+          <template #tbody>
+            <vs-tr :key="i" v-for="(tr, i) in submissions">
+              <vs-td>
+                <a href="#" @click="viewSubmissionDetail(tr.id)">
+                  {{ tr.id }}
+                </a>
+              </vs-td>
+              <vs-td>{{
+                $moment(tr.submitted_at).format("DD MMM YYYY HH:mm:ss")
+              }}</vs-td>
+              <vs-td>{{ tr.oj_name }}</vs-td>
+              <vs-td>{{ tr.oj_problem_code }}</vs-td>
+              <vs-td>
+                <a
+                  :href="`/problems/${tr.oj_name}/${tr.oj_problem_code}`"
+                  target="_blank"
+                >
+                  {{ tr.oj_problem_title }}
+                </a>
+              </vs-td>
+              <vs-td>{{ tr.user.username }}</vs-td>
+              <vs-td>
+                <span
+                  class="font-bold"
+                  :class="[
+                    {
+                      'text-green-500': tr.verdict === 'Accepted',
+                      'text-red-500': tr.verdict !== 'Accepted',
+                    },
+                  ]"
+                >
+                  {{ tr.verdict }}
+                </span>
+              </vs-td>
+              <vs-td>
+                <span
+                  class="font-bold"
+                  :class="[
+                    {
+                      'text-green-500': tr.verdict === 'Accepted',
+                      'text-red-500': tr.verdict !== 'Accepted',
+                    },
+                  ]"
+                >
+                  {{ tr.score }}
+                </span>
+              </vs-td>
+            </vs-tr>
+          </template>
+        </vs-table>
+        <vs-pagination
+          circle
+          v-model="page"
+          :length="metadata.total_page"
+        ></vs-pagination>
+      </div>
+    </div>
 
     <vs-dialog v-model="displaySubmissionDetailDialog" width="80vw">
       Status :
@@ -167,6 +213,24 @@ export default {
       submission: {},
       subtaskResults: [],
       displaySubmissionDetailDialog: false,
+      isFetchingSubmission: false,
+
+      filterForm: {
+        oj_names: ["Atcoder", "Codeforces", "TLX", "OjUz", "Gym"],
+        verdicts: [
+          "Accepted",
+          "Wrong Answer",
+          "Time Limit",
+          "Runtime Error",
+          "Compile Error",
+          "Memory Limit",
+        ],
+      },
+      filter: {
+        oj_names: [],
+        verdicts: [],
+        oj_problem_code: "",
+      },
     };
   },
   mounted() {
@@ -184,17 +248,24 @@ export default {
       require("brace/theme/monokai");
     },
     fetchSubmissions() {
+      this.isFetchingSubmission = true;
       this.$services.problem
         .getOjSubmissions(
           {
             limit: this.limit,
             offset: (this.page - 1) * this.limit,
+            oj_names: this.filter.oj_names,
+            oj_problem_code: this.filter.oj_problem_code,
+            verdicts: this.filter.verdicts,
           },
           this.$auth.getToken("local")
         )
         .then((response) => {
           this.submissions = response.data;
           this.metadata = response.metadata;
+        })
+        .finally(() => {
+          this.isFetchingSubmission = false;
         });
     },
 
