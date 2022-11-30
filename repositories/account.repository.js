@@ -44,4 +44,7 @@ export default {
   getLatestActiveVerificationCode(config = null) {
     return $axios.get(`${resourceAccount}/get-latest-active-verification-code`, config);
   },
+  getUserByUsername(username, config = null) {
+    return $axios.get(`${resourceAccount}/get-user-by-username/${username}`, config);
+  },
 }

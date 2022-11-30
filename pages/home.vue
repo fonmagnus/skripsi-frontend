@@ -205,7 +205,7 @@ export default {
           this.$auth.getToken("local")
         )
         .then((res) => {
-          this.problems = res.problems;
+          this.problems = res.data;
           this.metadata = res.metadata;
         })
         .finally(() => {

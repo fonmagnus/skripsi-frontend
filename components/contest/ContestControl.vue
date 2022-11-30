@@ -1,5 +1,8 @@
 <template>
-  <div class="flex items-center justify-end pb-1 pr-3 layout-container">
+  <div
+    class="flex items-center justify-end pb-1 pr-3"
+    :class="`layout-container${theme === 'dark' ? '--dark' : ''}`"
+  >
     <vs-button
       class="button mt-2"
       transparent
@@ -7,7 +10,8 @@
       @click="viewEditForm()"
       v-if="
         problemset.created_by === $auth.user.email ||
-        $auth.user.role === 'Admin'
+        $auth.user.role === 'Admin' ||
+        $auth.user.role === 'Coach'
       "
     >
       <span v-if="$vuetify.breakpoint.smAndUp"> Edit &nbsp; </span>
@@ -24,11 +28,6 @@
     </vs-button>
 
     <vs-button
-      v-if="
-        selectedProblem &&
-        ((selectedProblem.oj_problem && isSubmittable(selectedProblem)) ||
-          selectedProblem.coding_problem)
-      "
       class="button mt-2"
       :transparent="theme !== 'dark'"
       color="dark"
@@ -38,11 +37,6 @@
       <i class="bx bx-history"></i>
     </vs-button>
     <vs-button
-      v-if="
-        selectedProblem &&
-        ((selectedProblem.oj_problem && isSubmittable(selectedProblem)) ||
-          selectedProblem.coding_problem)
-      "
       class="button mt-2"
       @click="
         displaySubmitDialog = true;
@@ -53,28 +47,49 @@
       "
       flat
       active
-      :disabled="disableSubmission && $auth.user.role !== 'Admin'"
+      :disabled="
+        disableSubmission &&
+        $auth.user.role !== 'Admin' &&
+        $auth.user.role !== 'Coach'
+      "
     >
       <span v-if="$vuetify.breakpoint.smAndUp"> Submit Solution &nbsp; </span>
       <i class="bx bx-paper-plane"></i>
     </vs-button>
-    <vs-dialog v-model="displaySubmitDialog" width="80vw">
+    <vs-dialog v-model="displaySubmitDialog" width="60vw">
       <template #header>
-        <h4 class="mt-3">Copy and Paste your C++ Solution here</h4>
+        <h4 v-if="selectedProblem" class="mt-3 text-center">
+          {{ getSubmitInstruction(selectedProblem) }}
+        </h4>
       </template>
       <div class="flex flex-col">
-        <div class="flex justify-end">
+        <div
+          v-if="
+            selectedProblem &&
+            selectedProblem.oj_problem &&
+            selectedProblem.oj_problem.type !== 'output_only'
+          "
+          class="flex justify-end"
+        >
           <vs-checkbox
             label-before
             v-model="enableCodeEditor"
             class="center my-1 mx-3"
           >
-            <span style="font-family: Oxygen; font-size: 14px">
+            <span style="font-family: Lato; font-size: 14px">
               Enable Code Editor
             </span>
           </vs-checkbox>
         </div>
-        <div class="flex items-center justify-center">
+        <div
+          v-if="
+            (selectedProblem &&
+              selectedProblem.oj_problem &&
+              selectedProblem.oj_problem.type !== 'output_only') ||
+            (selectedProblem && selectedProblem.coding_problem)
+          "
+          class="flex centered"
+        >
           <editor
             v-if="enableCodeEditor"
             class="code-editor"
@@ -83,18 +98,21 @@
             lang="c_cpp"
             theme="monokai"
             width="1500px"
-            height="1024px"
+            height="600px"
           >
           </editor>
           <textarea
             v-else
-            class="mx-3 pa-2"
+            class="mx-3 p-2"
             :cols="$vuetify.breakpoint.mdAndUp ? 100 : 50"
             rows="25"
             v-model="sourceCode"
             style="border: 1px solid #ddd; font-family: Monaco, Monospace"
           >
           </textarea>
+        </div>
+        <div v-else class="flex centered">
+          <Uploader @doneUploading="assignFileName" />
         </div>
       </div>
       <template #footer>
@@ -149,7 +167,7 @@
         <h4 class="mt-3" style="text-align: center">Submissions</h4>
       </template>
 
-      <div class="flex items-center justify-center mb-3">
+      <div class="flex centered mb-3">
         <vs-button
           transparent
           :active="!isShowingAllSubmissions"
@@ -158,7 +176,7 @@
           My Submissions
         </vs-button>
         <vs-button
-          v-if="$auth.user.role === 'Admin'"
+          v-if="$auth.user.role === 'Admin' || $auth.user.role === 'Coach'"
           transparent
           :active="isShowingAllSubmissions"
           @click="isShowingAllSubmissions = true"
@@ -168,7 +186,7 @@
       </div>
 
       <!-- <div class="flex justify-end">
-        <vs-button v-if="$auth.user.role === 'Admin'" @click="rejudgeAll" transparent>Rejudge All &nbsp;
+        <vs-button v-if="($auth.user.role === 'Admin' || $auth.user.role === 'Coach')" @click="rejudgeAll" transparent>Rejudge All &nbsp;
           <i class="bx bx-sync"></i>
         </vs-button>
       </div> -->
@@ -225,7 +243,8 @@
                 </vs-button>
                 <vs-button
                   v-if="
-                    $auth.user.role === 'Admin' &&
+                    ($auth.user.role === 'Admin' ||
+                      $auth.user.role === 'Coach') &&
                     !tr.isRejudging &&
                     problemset.type === 'INTERNAL_CODING'
                   "
@@ -260,7 +279,7 @@
       </vs-table>
     </vs-dialog>
 
-    <vs-dialog v-model="displaySubmissionDetailDialog" width="80vw">
+    <vs-dialog v-model="displaySubmissionDetailDialog" width="60vw">
       Status :
       <span
         :style="formatClassWithoutStatus(submission.verdict)"
@@ -279,7 +298,7 @@
           (problemset.type === 'FULL_CODING' &&
             problemset.enable_partial_scoring)
         "
-        class="flex items-center justify-center mt-3"
+        class="flex centered mt-3"
       >
         <vs-table striped>
           <template #thead>
@@ -318,10 +337,7 @@
           <template #notFound> (Belum ada submission) </template>
         </vs-table>
       </div>
-      <div
-        class="flex items-center justify-center mt-3"
-        ref="theSubmissionDetail"
-      >
+      <div class="flex centered mt-3" ref="theSubmissionDetail">
         <editor
           class="code-editor"
           v-model="submission.source_code"
@@ -329,23 +345,18 @@
           lang="c_cpp"
           theme="monokai"
           width="3000px"
-          height="1024px"
+          height="600px"
         >
         </editor>
       </div>
     </vs-dialog>
 
-    <vs-dialog
-      v-model="displayEditProblemDialog"
-      width="60vw"
-      prevent-close
-      not-close
-    >
-      <div class="flex flex-col items-start justify-center mt-3">
+    <vs-dialog v-model="displayEditProblemDialog" width="60vw" prevent-close>
+      <div class="flex flex-col start-items justify-center mt-3">
         <h3 class="mx-3">Edit Problemset</h3>
-        <div class="flex flex-col justify-start items-start mt-3 mb-1">
+        <div class="flex flex-col justify-start start-items mt-3 mb-1">
           <span class="mx-3">Problems : </span>
-          <div class="flex justify-start items-start">
+          <div class="flex justify-start start-items">
             <vs-button class="button mx-3" flat @click="appendProblem"
               >Add &nbsp;<i class="bx bx-plus"></i
             ></vs-button>
@@ -354,7 +365,7 @@
 
         <div
           v-if="problemset.type === 'FULL_CODING'"
-          class="flex flex-col items-start"
+          class="flex flex-col start-items"
         >
           <div
             v-for="(problem, i) in currentProblems"
@@ -373,10 +384,13 @@
                 >Codeforces</vs-option
               >
               <vs-option label="CSES" value="CSES">CSES</vs-option>
+              <vs-option label="DMOJ" value="DMOJ">DMOJ</vs-option>
               <vs-option label="Gym" value="Gym">Gym</vs-option>
               <vs-option label="Kattis" value="Kattis">Kattis</vs-option>
+              <vs-option label="OjUz" value="OjUz">OjUz</vs-option>
               <vs-option label="SPOJ" value="SPOJ">SPOJ</vs-option>
               <vs-option label="TLX" value="TLX">TLX</vs-option>
+              <vs-option label="UVA" value="UVA">UVA</vs-option>
             </vs-select>
             <vs-input
               @change="fetchOJProblem(problem)"
@@ -411,7 +425,7 @@
 
         <div
           v-else-if="problemset.type === 'INTERNAL_CODING'"
-          class="flex flex-col items-start"
+          class="flex flex-col start-items"
         >
           <div
             v-for="(problem, i) in currentProblems"
@@ -458,13 +472,13 @@
     </vs-dialog>
 
     <vs-dialog v-model="displayRemoveProblemDialog">
-      <div class="flex flex-col items-center justify-center pt-3">
+      <div class="flex flex-col centered pt-3">
         <h3>Are you sure?</h3>
         <span style="text-align: center"
           >Apakah kamu yakin mau menghapus problem ini dari contest?
           <br />(operasi ini tidak dapat di-undo)</span
         >
-        <div class="flex items-center justify-center mt-3">
+        <div class="flex centered mt-3">
           <vs-button
             class="button"
             color="danger"
@@ -584,6 +598,7 @@ export default {
   computed: {
     ...mapGetters({
       theme: "theme/getTheme",
+      passphrase: "profile/getPassphrase",
     }),
   },
   methods: {
@@ -591,6 +606,21 @@ export default {
       this.deletedProblem = problem;
       this.deletedProblemIndex = i;
       this.displayRemoveProblemDialog = true;
+    },
+    getSubmitInstruction(selectedProblem) {
+      return selectedProblem.oj_problem &&
+        selectedProblem.oj_problem.type === "output_only"
+        ? "Silakan upload .zip file berisi output"
+        : "Silakan copy-paste source code (C++) milikmu di bawah ini 👇";
+    },
+    assignFileName(formData) {
+      formData.append("oj_name", this.selectedProblem.oj_problem.oj_name);
+      formData.append(
+        "oj_problem_code",
+        this.selectedProblem.oj_problem.oj_problem_code
+      );
+      formData.append("slug", this.problemset.slug);
+      this.sourceCode = formData;
     },
     appendProblem() {
       if (this.problemset.type === "FULL_CODING") {
@@ -676,7 +706,6 @@ export default {
         });
     },
     fetchOJProblem(problem) {
-      console.log("fetch oj problem");
       if (
         problem.oj_problem.oj_name === "" ||
         problem.oj_problem.oj_problem_code === ""
@@ -759,7 +788,8 @@ export default {
       if (this.problemset.type === "FULL_CODING") {
         if (email === "" || email === this.$auth.user.email) {
           if (
-            this.$auth.user.role === "Admin" &&
+            (this.$auth.user.role === "Admin" ||
+              this.$auth.user.role === "Coach") &&
             this.isShowingAllSubmissions
           ) {
             this.$services.problem
@@ -830,7 +860,8 @@ export default {
       } else if (this.problemset.type === "INTERNAL_CODING") {
         if (email === "" || email === this.$auth.user.email) {
           if (
-            this.$auth.user.role === "Admin" &&
+            (this.$auth.user.role === "Admin" ||
+              this.$auth.user.role === "Coach") &&
             this.isShowingAllSubmissions
           ) {
             this.$services.problem
@@ -1000,22 +1031,14 @@ export default {
       this.hasSubmittedAnswer = true;
       this.verdict = "Submitting";
       this.status = "Submitting";
-      if (this.problemset.type === "FULL_CODING") {
+      if (
+        this.selectedProblem.oj_problem &&
+        this.selectedProblem.oj_problem.type === "output_only"
+      ) {
         this.$services.problem
-          .submitOJProblem(
-            {
-              oj_name: this.selectedProblem?.oj_problem?.oj_name,
-              oj_problem_code:
-                this.selectedProblem?.oj_problem?.oj_problem_code,
-              source_code: this.sourceCode.replaceAll("\t", "  "),
-              slug: this.$route.params.slug,
-            },
-            this.$auth.getToken("local")
-          )
+          .uploadSolutionFile(this.sourceCode, this.$auth.getToken("local"))
           .then((response) => {
-            this.crawlRequestId = response.id;
             this.verdict = "Running";
-            this.keepFetchingSubmissionId(this.crawlRequestId);
             setTimeout(() => {
               this.displaySubmitDialog = false;
               this.viewSubmissionsHistory(this.selectedProblem);
@@ -1023,6 +1046,41 @@ export default {
           })
           .catch((response) => {
             this.verdict = "Submit Failed";
+            this.isSubmittingAnswer = false;
+          });
+        return;
+      }
+
+      if (this.problemset.type === "FULL_CODING") {
+        this.$services.problem
+          .submitOJProblem(
+            {
+              oj_name: this.selectedProblem?.oj_problem?.oj_name,
+              oj_problem_code:
+                this.selectedProblem?.oj_problem?.oj_problem_code,
+              source_code:
+                typeof this.sourceCode === "string"
+                  ? this.sourceCode.replaceAll("\t", "  ")
+                  : this.sourceCode,
+              slug: this.$route.params.slug,
+              passphrase: this.passphrase,
+            },
+            this.$auth.getToken("local")
+          )
+          .then((response) => {
+            this.crawlRequestId = response.id;
+            this.verdict = "Running";
+            setTimeout(() => {
+              this.displaySubmitDialog = false;
+              this.viewSubmissionsHistory(this.selectedProblem);
+            }, 2000);
+          })
+          .catch((error) => {
+            if (error.response.status === 400) {
+              this.verdict = "You cannot submit the same code twice";
+            } else {
+              this.verdict = "Submit Failed";
+            }
             this.isSubmittingAnswer = false;
           });
       } else {
@@ -1039,16 +1097,18 @@ export default {
             this.submissionId = response.submission_id;
             this.verdict = "Running";
             this.keepFetchingVerdict(this.submissionId);
+            setTimeout(() => {
+              this.displaySubmitDialog = false;
+              this.viewSubmissionsHistory(this.selectedProblem);
+            }, 2000);
           })
-          .catch((response) => {
+          .catch((error) => {
             this.verdict = "Submit Failed";
             this.isSubmittingAnswer = false;
+            if (error.response.status === 400) {
+              this.verdict = error.response.data;
+            }
           });
-
-        setTimeout(() => {
-          this.displaySubmitDialog = false;
-          this.viewSubmissionsHistory(this.selectedProblem);
-        }, 2000);
       }
     },
     editorInit: function () {
@@ -1079,86 +1139,6 @@ export default {
         return "background-color: #ff4658";
       }
     },
-    keepFetchingSubmissionId(crawlRequestId) {
-      if (this.problemset.type === "FULL_CODING") {
-        setTimeout(() => {
-          this.$services.problem
-            .getSubmissionId(crawlRequestId, this.$auth.getToken("local"))
-            .then((response) => {
-              if (response.submission_id) {
-                this.submissionId = response.submission_id;
-                this.keepFetchingVerdict(this.submissionId);
-                this.preventClose = false;
-                this.crawlAttempts = 0;
-              } else if (this.crawlAttempts < 10) {
-                this.crawlAttempts++;
-                this.keepFetchingSubmissionId(crawlRequestId);
-              } else {
-                this.crawlAttempts = 0;
-                this.verdict = "Submit Failed";
-                this.isSubmittingAnswer = false;
-              }
-            })
-            .catch((response) => {
-              this.crawlAttempts = 0;
-              this.verdict = "Submit Failed";
-              this.isSubmittingAnswer = false;
-            });
-        }, 10000);
-      }
-    },
-    keepFetchingVerdict(submissionId) {
-      if (this.problemset.type === "FULL_CODING") {
-        setTimeout(() => {
-          this.$services.problem
-            .getOJSubmissionVerdictForContest(
-              this.selectedProblem?.oj_problem?.oj_name,
-              this.selectedProblem?.oj_problem?.oj_problem_code,
-              this.submissionId,
-              this.$route.params.slug,
-              this.$auth.getToken("local")
-            )
-            .then((response) => {
-              this.verdict = response.verdict;
-              this.status = response.status;
-
-              if (this.status !== "Accepted" && this.status !== "Rejected") {
-                this.keepFetchingVerdict(submissionId);
-              } else {
-                this.isSubmittingAnswer = false;
-              }
-            })
-            .catch((response) => {
-              this.verdict = "Submit Failed";
-              this.isSubmittingAnswer = false;
-            });
-        }, 3000);
-      } else if (this.problemset.type === "INTERNAL_CODING") {
-        setTimeout(() => {
-          this.$services.problem
-            .getCodingSubmissionVerdict(
-              submissionId,
-              this.$auth.getToken("local")
-            )
-            .then((response) => {
-              this.verdict = response.verdict;
-              if (this.verdict === "Pending") {
-                this.keepFetchingVerdict(submissionId);
-              } else {
-                this.verdict = response.verdict;
-                this.status =
-                  response.verdict === "Accepted" ? "Accepted" : "Rejected";
-                this.isSubmittingAnswer = false;
-                this.verdictScore = response.score;
-              }
-            })
-            .catch((response) => {
-              this.verdict = "Submit Failed";
-              this.isSubmittingAnswer = false;
-            });
-        }, 3000);
-      }
-    },
     getCodingSubmissionVerdict(submission) {
       this.$services.problem
         .getCodingSubmissionVerdict(submission.id, this.$auth.getToken("local"))
@@ -1173,15 +1153,9 @@ export default {
           }, 1500 * (response.status === "Pending" || !response.status));
         });
     },
-    getOJSubmissionVerdictForContest(submission) {
+    getOjSubmission(submission) {
       this.$services.problem
-        .getOJSubmissionVerdictForContest(
-          this.selectedProblem?.oj_problem?.oj_name,
-          this.selectedProblem?.oj_problem?.oj_problem_code,
-          submission.submission_id ? submission.submission_id : submission.id,
-          this.$route.params.slug,
-          this.$auth.getToken("local")
-        )
+        .getOjSubmission(submission.id, this.$auth.getToken("local"))
         .then((response) => {
           submission.verdict = response.verdict;
           submission.status =
@@ -1198,7 +1172,7 @@ export default {
       if (this.problemset.type === "INTERNAL_CODING") {
         this.getCodingSubmissionVerdict(submission);
       } else {
-        this.getOJSubmissionVerdictForContest(submission);
+        this.getOjSubmission(submission);
       }
     },
     getLeaderboardStyle(submission, problem, ttlScore = -1, max = 100) {
@@ -1295,7 +1269,7 @@ export default {
   left: 0;
   width: 100vw;
   min-height: 2vh;
-  background-color: black;
+  background-color: rgb(57, 75, 89);
   color: white;
 }
 .code-editor {

@@ -121,6 +121,16 @@ export default {
     )
   },
 
+  getOjSubmission(submissionId, config = null) {
+    return $axios.get(
+      `${resource}/get-oj-submission/${submissionId}`, config
+    )
+  },
+
+  getStudentsWork(config = null) {
+    return $axios.get(`${resource}/get-students-work`, config)
+  },
+
   getOJSubmissionVerdict(ojName, ojProblemCode, submissionId, config = null) {
     return $axios.get(
       `${resource}/get-oj-submission-verdict/${ojName}/${ojProblemCode}/${submissionId}`, config

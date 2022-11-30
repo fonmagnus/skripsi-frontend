@@ -281,8 +281,10 @@ export default {
     getPhoto(user) {
       if (user && user.profile_photo) {
         return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/${user.profile_photo}`;
-      } else if (user) {
+      } else if (user && user.name) {
         return `https://ui-avatars.com/api/?name=${user.name}&background=random`;
+      } else if (user) {
+        return `https://ui-avatars.com/api/?name=${user.username}&background=random`;
       }
     },
   },

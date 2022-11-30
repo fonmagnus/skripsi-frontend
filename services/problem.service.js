@@ -361,6 +361,39 @@ const ProblemService = {
     );
   },
 
+  getOjSubmission(submissionId, token) {
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.getOjSubmission(
+        submissionId, 
+        { headers: { Authorization: token } })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
+
+  getStudentsWork(token, params = null) {
+    // set default order and sort
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.getStudentsWork({
+        headers: { 
+          Authorization: token,
+          // 'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW', 
+        },
+        params
+      })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
+
   getOJSubmissionsHistory(ojName, ojProblemCode, token) {
     return new Promise((resolve, reject) =>
       ProblemsRepository.getOJSubmissionsHistory(

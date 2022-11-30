@@ -191,6 +191,23 @@ const AccountService = {
         })
     );
   },
+
+  getUserByUsername(username, token, params = null) {
+    return new Promise((resolve, reject) =>
+      AccountRepository.getUserByUsername(username, {
+        headers: { 
+          Authorization: token,
+        },
+        params
+      })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
 };
 
 export default AccountService;

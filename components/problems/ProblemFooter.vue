@@ -1,9 +1,12 @@
 <template>
-  <div class="flex items-center justify-end pb-1 pr-3 layout-container">
+  <div
+    class="flex items-center justify-end pb-1 pr-3"
+    :class="`layout-container${theme === 'dark' ? '--dark' : ''}`"
+  >
     <vs-button
       class="button mt-2"
+      :transparent="theme !== 'dark'"
       color="dark"
-      flat
       @click="viewSubmissionsHistory"
     >
       <span v-if="$vuetify.breakpoint.smAndUp"> Submissions &nbsp; </span>
@@ -259,9 +262,16 @@
 </template>  
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   components: {
     editor: require("vue2-ace-editor"),
+  },
+  computed: {
+    ...mapGetters({
+      theme: "theme/getTheme",
+      passphrase: "profile/getPassphrase",
+    }),
   },
   data() {
     return {
@@ -360,6 +370,7 @@ export default {
             oj_problem_code: this.$route.params.oj_problem_code,
             source_code: this.sourceCode.replaceAll("\t", "  "),
             slug: this.$route.params.slug,
+            passphrase: this.passphrase,
           },
           this.$auth.getToken("local")
         )
@@ -374,6 +385,8 @@ export default {
         })
         .catch((response) => {
           this.verdict = "Submit Failed";
+        })
+        .finally((response) => {
           this.isSubmittingAnswer = false;
         });
     },
@@ -408,13 +421,7 @@ export default {
     keepFetchingVerdict(submissionId) {
       setTimeout(() => {
         this.$services.problem
-          .getOJSubmissionVerdictForContest(
-            this.$route.params.oj_name,
-            this.$route.params.oj_problem_code,
-            this.submissionId,
-            this.$route.params.slug,
-            this.$auth.getToken("local")
-          )
+          .getOjSubmission(this.submissionId, this.$auth.getToken("local"))
           .then((response) => {
             this.verdict = response.verdict;
             this.status = response.status;
@@ -431,15 +438,9 @@ export default {
           });
       }, 3000);
     },
-    getOJSubmissionVerdictForContest(submission) {
+    getOjSubmission(submission) {
       this.$services.problem
-        .getOJSubmissionVerdictForContest(
-          this.$route.params.oj_name,
-          this.$route.params.oj_problem_code,
-          submission.submission_id ? submission.submission_id : submission.id,
-          this.$route.params.slug,
-          this.$auth.getToken("local")
-        )
+        .getOjSubmission(submission.id, this.$auth.getToken("local"))
         .then((response) => {
           submission.verdict = response.verdict;
           submission.status =
@@ -453,7 +454,7 @@ export default {
     },
     getSubmission(submission) {
       submission.isRefreshing = true;
-      this.getOJSubmissionVerdictForContest(submission);
+      this.getOjSubmission(submission);
     },
     viewSubmissionDetail(id) {
       this.displaySubmissionDetailDialog = true;
