@@ -208,6 +208,23 @@ const AccountService = {
         })
     );
   },
+
+  getUserStatistics(token, username, params = null) {
+    return new Promise((resolve, reject) =>
+      AccountRepository.getUserStatistics(username, {
+        headers: { 
+          Authorization: token,
+        },
+        params
+      })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
 };
 
 export default AccountService;

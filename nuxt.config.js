@@ -80,6 +80,7 @@ export default {
     '@nuxtjs/moment',
     '@nuxtjs/dotenv',
     '@nuxt/postcss8',
+    'nuxt-gsap-module',
   ],
   
   moment: {
@@ -182,5 +183,8 @@ export default {
         tokenType: 'JWT'
       },
     }
+  },
+  gsap: {
+    /* Module Options */
   }
 }

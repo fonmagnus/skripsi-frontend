@@ -47,4 +47,7 @@ export default {
   getUserByUsername(username, config = null) {
     return $axios.get(`${resourceAccount}/get-user-by-username/${username}`, config);
   },
+  getUserStatistics(username, config = null) {
+    return $axios.get(`${resourceAccount}/get-user-statistics/${username}`, config);
+  },
 }

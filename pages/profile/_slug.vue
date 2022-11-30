@@ -54,7 +54,7 @@
       >
         <span class="text-sm font-black"> Profile Information </span>
       </div>
-      <!-- <div
+      <div
         :color="'#4e54c8'"
         @click="activeMenu = 'statistics'"
         class="px-4 py-2 rounded-xl cursor-pointer"
@@ -65,7 +65,7 @@
         ]"
       >
         <span class="text-sm font-black text-indigo-600"> Statistics </span>
-      </div> -->
+      </div>
       <div
         :color="'#4e54c8'"
         @click="activeMenu = 'user-history'"
@@ -133,7 +133,7 @@
         </div>
       </div>
     </div>
-    <!-- <statistics class="hidden" id="statistics" /> -->
+    <statistics v-if="activeMenu === 'statistics'" id="statistics" />
     <StudentJourneyViewer
       v-if="profile && activeMenu === 'user-history'"
       hide-photo
