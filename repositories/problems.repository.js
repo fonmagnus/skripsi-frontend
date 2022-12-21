@@ -405,4 +405,19 @@ export default {
       config
     )
   },
+
+  getComments(config = null) {
+    return $axios.get(
+      `${resource}/get-comments`,
+      config
+    )
+  },
+
+  postComment(body, config = null) {
+    return $axios.post(
+      `${resource}/post-comment`,
+      body,
+      config
+    )
+  },
 };

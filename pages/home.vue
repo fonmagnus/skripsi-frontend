@@ -46,6 +46,16 @@
         />
       </div>
 
+      <div class="flex flex-col mt-4 shrink">
+        <span class="text-sm mb-2">Problem Code</span>
+        <input
+          label="Problem Code"
+          step="100"
+          v-model="filter.oj_problem_code"
+          class="border px-2 py-1 text-sm"
+        />
+      </div>
+
       <vs-button class="button mt-12" transparent @click="fetchProblems">
         Search &nbsp;
         <i class="bx bx-search"></i>
@@ -158,6 +168,7 @@ export default {
           from: 0,
           to: 3500,
         },
+        oj_problem_code: "",
       },
       isFetchingProblems: false,
       animationOptions: {
@@ -201,6 +212,7 @@ export default {
             difficulty_from: this.filter.difficulty.from,
             difficulty_to: this.filter.difficulty.to,
             oj_names: this.filter.oj_names,
+            oj_problem_code: this.filter.oj_problem_code,
           },
           this.$auth.getToken("local")
         )

@@ -37,6 +37,7 @@
       ></div>
     </div>
 
+    <ProblemDiscussion/>
     <ProblemFooter />
   </div>
 </template>

@@ -952,6 +952,37 @@ const ProblemService = {
         })
     );
   },
+
+  getComments(params, token) {
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.getComments(
+        { 
+          headers: { Authorization: token },
+          params,
+        })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
+
+  postComment(body, token) {
+    return new Promise((resolve, reject) =>
+      ProblemsRepository.postComment(
+        body,
+        { headers: { Authorization: token } })
+        .then(({ data }) => {
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        })
+    );
+  },
+
 };
 
 export default ProblemService;

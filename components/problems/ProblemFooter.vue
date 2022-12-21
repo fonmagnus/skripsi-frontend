@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center justify-end pb-1 pr-3"
+    class="flex items-center justify-end pb-1 pr-3 z-10"
     :class="`layout-container${theme === 'dark' ? '--dark' : ''}`"
   >
     <vs-button
