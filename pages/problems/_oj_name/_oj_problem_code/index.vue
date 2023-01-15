@@ -25,19 +25,15 @@
     >
 
     <div v-if="problem" class="mx-3 flex flex-col">
-      <latex
+      <!-- <latex
         v-if="renderable"
         :content="readMD(problem.body)"
         class="ml-3 mt-3 html-container"
-      ></latex>
-      <div
-        v-else
-        v-html="readMD(problem.body)"
-        class="ml-3 mt-3 html-container"
-      ></div>
+      ></latex> -->
+      <div v-html="readMD(problem.body)" class="ml-3 mt-3 html-container"></div>
     </div>
 
-    <ProblemDiscussion/>
+    <ProblemDiscussion />
     <ProblemFooter />
   </div>
 </template>
