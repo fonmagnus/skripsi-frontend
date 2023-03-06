@@ -1,90 +1,53 @@
 <template>
-  <div
-    class="
-      py-32
-      sm:py-24
-      md:py-16
-      px-8
-      sm:px-12
-      md:px-16
-      lg:px-48
-      w-full
-      flex flex-col
-      items-center
-    "
-  >
-    <h3 v-if="problem" class="problem-title">
-      {{ problem.title }}
-    </h3>
-    <span class="constraints" v-if="problem"
-      >Time Limit : <b>{{ problem.time_limit }}</b></span
-    >
-
-    <span class="constraints" v-if="problem"
-      >Memory Limit : <b>{{ problem.memory_limit }}</b></span
-    >
-
-    <div v-if="problem" class="mx-3 flex flex-col">
-      <!-- <latex
-        v-if="renderable"
-        :content="readMD(problem.body)"
-        class="ml-3 mt-3 html-container"
-      ></latex> -->
-      <!-- <div v-html="readMD(problem.body)" class="ml-3 mt-3 html-container"></div> -->
-      <ProblemStatementRenderer v-if="!rendering" :content="problem.body" />
-    </div>
-
-    <ProblemDiscussion />
-    <ProblemFooter />
+  <div v-if="content" class="flex flex-col w-full p-3">
+    <span
+      ref="mathJaxEl"
+      v-if="renderable"
+      v-html="readMD"
+      class="e-mathjax"
+      :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
+    ></span>
+    <div
+      v-else
+      v-html="readMD"
+      class="ml-3 mt-3"
+      :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
+    ></div>
+    <!-- <span v-else>Not renderable</span> -->
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
-  data() {
-    return {
-      problem: null,
-      rendering: false,
-    };
+  props: {
+    content: {
+      type: String,
+      required: true,
+    },
+  },
+  head: {
+    script: [
+      {
+        src: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML",
+      },
+    ],
   },
   mounted() {
-    this.rendering = true;
-    this.$services.problem
-      .getOjProblem(
-        this.$route.params.oj_name,
-        this.$route.params.oj_problem_code,
-        this.$auth.getToken("local")
-      )
-      .then((res) => {
-        this.problem = res;
-        this.rendering = false;
-        this.rerender();
-      });
+    this.renderMathJax();
   },
   computed: {
+    ...mapGetters({
+      theme: "theme/getTheme",
+    }),
     renderable() {
       if (navigator.userAgent.indexOf("Chrome") != -1) {
         return true;
       }
       return false;
     },
-  },
-  methods: {
-    rerender() {
-      this.rendering = true;
-      this.$nextTick().then(() => {
-        this.rendering = false;
-      });
-    },
-    reRender() {
-      if (window.MathJax) {
-        console.log("rendering mathjax");
-        window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub], () =>
-          console.log("done")
-        );
-      }
-    },
-    readMD(mdData) {
+    readMD() {
+      let mdData = this.content;
       mdData = mdData.replaceAll("$$$", "$$");
       let result = "";
       let flag = false;
@@ -113,7 +76,38 @@ export default {
       mdData = mdData.replaceAll("</var></pre>", "</var></div>");
       mdData = mdData.replaceAll("<var>", "$$");
       mdData = mdData.replaceAll("</var>", "$$");
+
       return this.$md.render(mdData);
+    },
+  },
+  methods: {
+    renderMathJax() {
+      if (window.MathJax) {
+        window.MathJax.Hub.Config({
+          tex2jax: {
+            inlineMath: [
+              ["$", "$"],
+            ],
+            displayMath: [
+              ["$$", "$$"],
+            ],
+            processEscapes: true,
+            processEnvironments: true,
+          },
+          // Center justify equations in code and markdown cells. Elsewhere
+          // we use CSS to left justify single line equations in code cells.
+          displayAlign: "center",
+          "HTML-CSS": {
+            styles: { ".MathJax_Display": { margin: 0 } },
+            linebreaks: { automatic: true },
+          },
+        });
+        window.MathJax.Hub.Queue([
+          "Typeset",
+          window.MathJax.Hub,
+          this.$refs.mathJaxEl,
+        ]);
+      }
     },
   },
 };
@@ -122,6 +116,8 @@ export default {
 <style lang="scss" scoped>
 @import "~vuetify/src/styles/styles.sass";
 .html-container {
+  background-color: rgb(244, 245, 246);
+  padding: 24px;
 }
 
 .html-container--dark {
@@ -158,6 +154,11 @@ export default {
 .html-container--dark ::v-deep li {
   margin-left: 24px;
   list-style-type: disc;
+}
+
+.html-container--dark ::v-deep ol li {
+  margin-left: 24px;
+  list-style-type: number;
 }
 
 .html-container ::v-deep .section-title {
@@ -265,15 +266,5 @@ export default {
 
 .html-container--dark {
   width: 100%;
-}
-
-.constraints {
-  text-align: center;
-}
-
-.problem-title {
-  text-align: center;
-  font-size: 1.5rem !important;
-  font-weight: 900 !important;
 }
 </style>

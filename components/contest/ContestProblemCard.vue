@@ -62,7 +62,7 @@
 
     <div v-if="problem.oj_problem" class="mx-3 flex flex-col">
       <!-- <span v-html="readMD(problem.oj_problem.body)" class="html-container"></span> -->
-      <latex
+      <!-- <latex
         v-if="renderable"
         :content="readMD(problem.oj_problem.body)"
         :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
@@ -73,7 +73,8 @@
         v-html="readMD(problem.oj_problem.body)"
         class="ml-3 mt-3"
         :class="`html-container${theme === 'dark' ? '--dark' : ''}`"
-      ></div>
+      ></div> -->
+      <ProblemStatementRenderer v-if="!rendering" :content="problemContent" />
       <!-- <span v-else>Not renderable</span> -->
     </div>
   </div>
@@ -113,6 +114,15 @@ export default {
         return true;
       }
       return false;
+    },
+    problemContent() {
+      if (this.problem.oj_problem) {
+        if (this.problem.alt_description)
+          return this.problem.alt_description.body;
+        return this.problem.oj_problem.body;
+      }
+      if (this.problem.coding_problem) return this.problem.coding_problem.body;
+      return "";
     },
   },
   data() {
